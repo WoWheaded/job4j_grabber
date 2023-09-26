@@ -93,6 +93,15 @@ public class PsqlStore implements Store {
         return post;
     }
 
+    private Post createPostFromResultSet(ResultSet resultSet) throws SQLException {
+        int id = resultSet.getInt(1);
+        String name = resultSet.getString("name");
+        String text = resultSet.getString("text");
+        String link = resultSet.getString("link");
+        LocalDateTime created = resultSet.getTimestamp("created").toLocalDateTime();
+        return new Post(id, name, text, link, created);
+    }
+
     @Override
     public void close() throws SQLException {
         if (cnn != null) {
