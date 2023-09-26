@@ -5,7 +5,6 @@ import ru.job4j.quartz.AlertRabbit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -98,18 +97,5 @@ public class PsqlStore implements Store {
         if (cnn != null) {
             cnn.close();
         }
-    }
-
-    public static void main(String[] args) throws SQLException, IOException {
-        Properties properties = new Properties();
-        try (PsqlStore psqlStore = new PsqlStore(properties)) {
-            psqlStore.save(new Post("1 tittle", "1 link", "1 descc", LocalDateTime.now()));
-            psqlStore.save(new Post("2 tittle", "2 link", "2 descc", LocalDateTime.now()));
-            psqlStore.save(new Post("3 tittle", "3 link", "3 descc", LocalDateTime.now()));
-            List<Post> list = psqlStore.getAll();
-            list.forEach(System.out::println);
-            System.out.println(psqlStore.findById(1));
-        }
-
     }
 }
