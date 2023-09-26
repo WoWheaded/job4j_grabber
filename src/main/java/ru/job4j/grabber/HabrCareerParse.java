@@ -17,7 +17,6 @@ public class HabrCareerParse implements Parse {
     private static final String SOURCE_LINK = "https://career.habr.com";
     private static final String PAGE_LINK = String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
     private static int page = 2;
-    private int id = 0;
 
     private final DateTimeParser dateTimeParser;
 
@@ -56,7 +55,7 @@ public class HabrCareerParse implements Parse {
             String dataTimeOfVacancy = row.select(".vacancy-card__date time").first().attr("datetime");
             String linkElementAsString = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
             String description = retrieveDescription(linkElementAsString);
-            Post post = new Post(id++, vacancyName, linkElementAsString, description, dateTimeParser.parse(dataTimeOfVacancy));
+            Post post = new Post(vacancyName, linkElementAsString, description, dateTimeParser.parse(dataTimeOfVacancy));
             postList.add(post);
         });
         return postList;
