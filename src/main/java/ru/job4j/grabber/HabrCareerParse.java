@@ -14,14 +14,20 @@ import java.time.format.DateTimeFormatter;
 public class HabrCareerParse {
 
     private static final String SOURCE_LINK = "https://career.habr.com";
-
-    private static final String PAGE_LINK = String.format("%s/vacancies/java_developer", SOURCE_LINK);
+    private static final String PAGE_LINK = String.format("%s/vacancies/java_developer?page=", SOURCE_LINK);
 
     public static void main(String[] args) throws IOException {
-        DateTimeParser dateTimeParser = new HabrCareerDateTimeParser();
-        Connection connection = Jsoup.connect(PAGE_LINK);
+        for (int i = 1; i <= 5; i++) {
+            Connection connection = Jsoup.connect(PAGE_LINK + i);
+            System.out.println(i + " СТРАНИЦА");
+            getJobs(connection);
+        }
+    }
+
+    private static void getJobs(Connection connection) throws IOException {
         Document document = connection.get();
         Elements rows = document.select(".vacancy-card__inner");
+        DateTimeParser dateTimeParser = new HabrCareerDateTimeParser();
         rows.forEach(row -> {
             Element titleElement = row.select(".vacancy-card__title").first();
             Element linkElement = titleElement.child(0);
