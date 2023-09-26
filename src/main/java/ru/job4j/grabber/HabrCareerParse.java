@@ -25,8 +25,13 @@ public class HabrCareerParse {
         }
     }
 
-    private static String retrieveDescription(String link) throws IOException {
-        Document document = Jsoup.connect(link).get();
+    private static String retrieveDescription(String link) {
+        Document document = null;
+        try {
+            document = Jsoup.connect(link).get();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return document.select(".vacancy-description__text").first().text();
     }
 
@@ -42,11 +47,8 @@ public class HabrCareerParse {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-mm-ddТhh:mm:ss");
             dataTimeOfVacancy = dateTimeParser.parse(dataTimeOfVacancy).format(dateTimeFormatter);
             String link = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
-            try {
-                System.out.printf("%s -- %s -- %s%n %s%n", dataTimeOfVacancy, vacancyName, link, retrieveDescription(link));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            System.out.printf("%s -- %s -- %s%n %s%n", dataTimeOfVacancy, vacancyName, link, retrieveDescription(link));
+
         });
     }
 }
