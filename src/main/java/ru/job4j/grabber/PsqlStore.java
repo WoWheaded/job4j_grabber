@@ -58,11 +58,7 @@ public class PsqlStore implements Store {
             statement.execute();
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Post post = new Post(resultSet.getInt(1),
-                            resultSet.getString("name"),
-                            resultSet.getString("text"),
-                            resultSet.getString("link"),
-                            resultSet.getTimestamp("created").toLocalDateTime());
+                    Post post = createPostFromResultSet(resultSet);
                     result.add(post);
                 }
             }
@@ -80,11 +76,7 @@ public class PsqlStore implements Store {
             statement.execute();
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    post = new Post(resultSet.getInt(1),
-                            resultSet.getString("name"),
-                            resultSet.getString("text"),
-                            resultSet.getString("link"),
-                            resultSet.getTimestamp("created").toLocalDateTime());
+                    post = createPostFromResultSet(resultSet);
                 }
             }
         } catch (SQLException e) {
@@ -98,6 +90,15 @@ public class PsqlStore implements Store {
         if (cnn != null) {
             cnn.close();
         }
+    }
+
+    private Post createPostFromResultSet(ResultSet resultSet) throws SQLException {
+        int id = resultSet.getInt(1);
+        String name = resultSet.getString("name");
+        String text = resultSet.getString("text");
+        String link = resultSet.getString("link");
+        LocalDateTime created = resultSet.getTimestamp("created").toLocalDateTime();
+        return new Post(id, name, text, link, created);
     }
 
     public static void main(String[] args) throws SQLException, IOException {
