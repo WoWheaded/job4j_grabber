@@ -5,6 +5,7 @@ import ru.job4j.quartz.AlertRabbit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -32,11 +33,11 @@ public class PsqlStore implements Store {
     @Override
     public void save(Post post) {
         try (PreparedStatement statement =
-                     cnn.prepareStatement("INSERT INTO post(name, text, link, created) VALUES(?, ?, ?, ?) "
+                     cnn.prepareStatement("INSERT INTO post(name, link, text, created) VALUES(?, ?, ?, ?) "
                              + "ON CONFLICT (link) DO NOTHING", Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, post.getTitle());
-            statement.setString(2, post.getDescription());
-            statement.setString(3, post.getLink());
+            statement.setString(2, post.getLink());
+            statement.setString(3, post.getDescription());
             statement.setTimestamp(4, Timestamp.valueOf(post.getCreated()));
             statement.execute();
             try (ResultSet generatedId = statement.getGeneratedKeys()) {
@@ -49,6 +50,15 @@ public class PsqlStore implements Store {
         }
     }
 
+    private Post createPostFromResultSet(ResultSet resultSet) throws SQLException {
+        int id = resultSet.getInt(1);
+        String name = resultSet.getString("name");
+        String link = resultSet.getString("link");
+        String text = resultSet.getString("text");
+        LocalDateTime created = resultSet.getTimestamp("created").toLocalDateTime();
+        return new Post(id, name, link, text, created);
+    }
+
     @Override
     public List<Post> getAll() {
         List<Post> result = new ArrayList<>();
@@ -57,11 +67,7 @@ public class PsqlStore implements Store {
             statement.execute();
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Post post = new Post(resultSet.getInt(1),
-                            resultSet.getString("name"),
-                            resultSet.getString("text"),
-                            resultSet.getString("link"),
-                            resultSet.getTimestamp("created").toLocalDateTime());
+                    Post post = createPostFromResultSet(resultSet);
                     result.add(post);
                 }
             }
@@ -79,11 +85,7 @@ public class PsqlStore implements Store {
             statement.execute();
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    post = new Post(resultSet.getInt(1),
-                            resultSet.getString("name"),
-                            resultSet.getString("text"),
-                            resultSet.getString("link"),
-                            resultSet.getTimestamp("created").toLocalDateTime());
+                    post = createPostFromResultSet(resultSet);
                 }
             }
         } catch (SQLException e) {
