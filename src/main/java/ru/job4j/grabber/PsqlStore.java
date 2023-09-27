@@ -5,6 +5,7 @@ import ru.job4j.quartz.AlertRabbit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -91,15 +92,6 @@ public class PsqlStore implements Store {
             e.printStackTrace();
         }
         return post;
-    }
-
-    private Post createPostFromResultSet(ResultSet resultSet) throws SQLException {
-        int id = resultSet.getInt(1);
-        String name = resultSet.getString("name");
-        String text = resultSet.getString("text");
-        String link = resultSet.getString("link");
-        LocalDateTime created = resultSet.getTimestamp("created").toLocalDateTime();
-        return new Post(id, name, text, link, created);
     }
 
     @Override
